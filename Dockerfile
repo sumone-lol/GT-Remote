@@ -13,6 +13,7 @@ RUN apt update -y && \
         yasm \
         libgtk-3-dev \
         clang \
+        libclang-dev \
         libxcb-randr0-dev \
         libxdo-dev \
         libxfixes-dev \
@@ -30,7 +31,8 @@ RUN apt update -y && \
         libgstreamer1.0-dev \
         libgstreamer-plugins-base1.0-dev \
         ca-certificates \
-        ninja-build && \
+        ninja-build \
+        xz-utils && \
         rm -rf /var/lib/apt/lists/*
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.30.6/cmake-3.30.6.tar.gz --no-check-certificate && \
@@ -43,6 +45,16 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.30.6/cmake-3.30.6
 RUN git clone --branch 2023.04.15 --depth=1 https://github.com/microsoft/vcpkg && \
     /vcpkg/bootstrap-vcpkg.sh -disableMetrics && \
     /vcpkg/vcpkg --disable-metrics install libvpx libyuv opus aom
+
+# Install Flutter SDK
+RUN cd /opt && \
+    wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && \
+    tar -xf flutter_linux_3.24.5-stable.tar.xz && \
+    rm flutter_linux_3.24.5-stable.tar.xz
+ENV PATH="/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:${PATH}"
+RUN git config --global --add safe.directory /opt/flutter && \
+    flutter config --no-analytics && \
+    dart pub global activate ffigen --version 5.0.1
 
 RUN groupadd -r user && \
     useradd -r -g user user --home /home/user && \
@@ -57,6 +69,10 @@ USER user
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh && \
     chmod +x rustup.sh && \
     ./rustup.sh -y
+
+# Install flutter_rust_bridge_codegen (must match version in Cargo.toml)
+RUN . "$HOME/.cargo/env" && \
+    cargo install flutter_rust_bridge_codegen --version 1.80.1
 
 USER root
 ENV HOME=/home/user

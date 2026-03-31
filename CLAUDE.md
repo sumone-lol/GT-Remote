@@ -63,6 +63,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Requires vcpkg for C++ dependencies: `libvpx`, `libyuv`, `opus`, `aom`
 - Set `VCPKG_ROOT` environment variable
 - Download appropriate Sciter library for legacy UI support
+- `libs/hbb_common` is a git submodule — run `git submodule update --init --recursive` after cloning
+
+### GCC 12+ Workaround
+- On Linux with GCC 12+, `libwebm` fails to compile due to missing `<cstdint>` include
+- `build.py` sets this automatically; for manual `cargo build`, set: `CXXFLAGS="-include cstdint" cargo build`
 
 ### Ignore Patterns
 When working with files, ignore these directories:

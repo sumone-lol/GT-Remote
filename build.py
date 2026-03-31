@@ -14,6 +14,13 @@ from pathlib import Path
 windows = platform.platform().startswith('Windows')
 osx = platform.platform().startswith(
     'Darwin') or platform.platform().startswith("macOS")
+
+# GCC 12+ no longer implicitly includes <cstdint> in C++ headers.
+# This ensures libwebm and other C++ dependencies compile on modern toolchains.
+if 'CXXFLAGS' not in os.environ:
+    os.environ['CXXFLAGS'] = '-include cstdint'
+elif '-include cstdint' not in os.environ['CXXFLAGS']:
+    os.environ['CXXFLAGS'] += ' -include cstdint'
 hbb_name = 'rustdesk' + ('.exe' if windows else '')
 exe_path = 'target/release/' + hbb_name
 if windows:
