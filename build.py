@@ -17,10 +17,12 @@ osx = platform.platform().startswith(
 
 # GCC 12+ no longer implicitly includes <cstdint> in C++ headers.
 # This ensures libwebm and other C++ dependencies compile on modern toolchains.
-if 'CXXFLAGS' not in os.environ:
-    os.environ['CXXFLAGS'] = '-include cstdint'
-elif '-include cstdint' not in os.environ['CXXFLAGS']:
-    os.environ['CXXFLAGS'] += ' -include cstdint'
+# Only apply on Linux — MSVC does not support the -include flag.
+if not windows:
+    if 'CXXFLAGS' not in os.environ:
+        os.environ['CXXFLAGS'] = '-include cstdint'
+    elif '-include cstdint' not in os.environ['CXXFLAGS']:
+        os.environ['CXXFLAGS'] += ' -include cstdint'
 hbb_name = 'rustdesk' + ('.exe' if windows else '')
 exe_path = 'target/release/' + hbb_name
 if windows:
