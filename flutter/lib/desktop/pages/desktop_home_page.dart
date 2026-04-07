@@ -56,10 +56,17 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 
   final GlobalKey _childKey = GlobalKey();
 
+  final RxString _supportStatus = ''.obs;
+  final RxBool _isRequesting = false.obs;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final isOutgoingOnly = bind.isOutgoingOnly();
     final isIncomingOnly = bind.isIncomingOnly();
+    if (isOutgoingOnly) {
+      return _buildBlock(child: _buildUserModePage(context));
+    }
     return _buildBlock(
         child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,6 +78,99 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     ));
   }
 
+  Widget _buildUserModePage(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.titleLarge?.color;
+    return Container(
+      color: Theme.of(context).colorScheme.background,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo
+            Align(
+              alignment: Alignment.center,
+              child: loadLogo(),
+            ),
+            const SizedBox(height: 20),
+            // ID display
+            FutureBuilder<String>(
+              future: bind.mainGetMyId(),
+              builder: (context, snapshot) {
+                final id = snapshot.data ?? '';
+                return Column(
+                  children: [
+                    Text(
+                      'Your ID',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: textColor?.withOpacity(0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      id,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 40),
+            // Request Support button
+            Obx(() => SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isRequesting.value ? null : _onRequestSupport,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: MyTheme.accent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      _isRequesting.value
+                          ? 'Requesting...'
+                          : 'Request Support',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                )),
+            const SizedBox(height: 16),
+            // Status text
+            Obx(() => Text(
+                  _supportStatus.value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textColor?.withOpacity(0.6),
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onRequestSupport() {
+    // TODO: Replace with actual technician IDs from config
+    const technicianIds = <String>[];
+    if (technicianIds.isEmpty) {
+      _supportStatus.value = 'No technicians configured';
+      return;
+    }
+    _isRequesting.value = true;
+    _supportStatus.value = 'Connecting to technician...';
+    // Connect to the first available technician
+    connect(context, technicianIds.first);
+  }
+
   Widget _buildBlock({required Widget child}) {
     return buildRemoteBlock(
         block: _block, mask: true, use: canBeBlocked, child: child);
@@ -79,6 +179,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   Widget buildLeftPane(BuildContext context) {
     final isIncomingOnly = bind.isIncomingOnly();
     final isOutgoingOnly = bind.isOutgoingOnly();
+    final textColor = Theme.of(context).textTheme.titleLarge?.color;
     final children = <Widget>[
       if (!isOutgoingOnly) buildPresetPasswordWarning(),
       if (bind.isCustomClient())
@@ -90,7 +191,32 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         alignment: Alignment.center,
         child: loadLogo(),
       ),
-      buildTip(context),
+      if (isIncomingOnly)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            'Technician Mode',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: MyTheme.accent,
+            ),
+          ),
+        ),
+      if (isIncomingOnly)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Waiting for support requests...',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: textColor?.withOpacity(0.6),
+            ),
+          ),
+        ),
+      if (!isIncomingOnly) buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
       FutureBuilder<Widget>(
@@ -127,7 +253,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         ).marginOnly(bottom: 6, right: 6)
       ]);
     }
-    final textColor = Theme.of(context).textTheme.titleLarge?.color;
     return ChangeNotifierProvider.value(
       value: gFFI.serverModel,
       child: Container(
