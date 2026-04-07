@@ -50,6 +50,7 @@ fn initialize(app_dir: &str, custom_client_config: &str) {
     } else {
         crate::read_custom_client(custom_client_config);
     }
+    crate::load_technician_mode();
     #[cfg(target_os = "android")]
     {
         // flexi_logger can't work when android_logger initialized.
@@ -2391,6 +2392,10 @@ pub fn is_incoming_only() -> SyncReturn<bool> {
 
 pub fn is_outgoing_only() -> SyncReturn<bool> {
     SyncReturn(config::is_outgoing_only())
+}
+
+pub fn is_technician_mode() -> SyncReturn<bool> {
+    SyncReturn(config::is_technician_mode())
 }
 
 pub fn is_custom_client() -> SyncReturn<bool> {

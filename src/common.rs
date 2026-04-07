@@ -1804,6 +1804,64 @@ pub fn load_custom_client() {
     }
 }
 
+/// Checks for `technician.key` next to the executable.
+/// If the file exists and contains a valid secret, enables technician (incoming) mode.
+/// Otherwise, defaults to user (outgoing) mode.
+pub fn load_technician_mode() {
+    use hbb_common::sha2::{Digest, Sha256};
+
+    // SHA256 hash of the expected technician key secret.
+    // To generate: echo -n "your-secret" | sha256sum
+    // TODO: Replace with your actual technician key hash before deployment.
+    const TECHNICIAN_KEY_HASH: &str =
+        "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+
+    let path = match std::env::current_exe()
+        .ok()
+        .and_then(|x| x.parent().map(|p| p.to_path_buf()))
+    {
+        Some(p) => p.join("technician.key"),
+        None => {
+            set_gt_mode(false);
+            return;
+        }
+    };
+
+    if !path.is_file() {
+        set_gt_mode(false);
+        return;
+    }
+
+    let Ok(secret) = std::fs::read_to_string(&path) else {
+        set_gt_mode(false);
+        return;
+    };
+
+    let mut hasher = Sha256::new();
+    hasher.update(secret.trim().as_bytes());
+    let hash: String = hasher.finalize().iter().map(|b| format!("{:02x}", b)).collect();
+
+    if hash == TECHNICIAN_KEY_HASH {
+        log::info!("Technician mode enabled");
+        set_gt_mode(true);
+    } else {
+        log::warn!("Invalid technician.key, running in user mode");
+        set_gt_mode(false);
+    }
+}
+
+fn set_gt_mode(is_technician: bool) {
+    let mut settings = config::HARD_SETTINGS.write().unwrap();
+    if is_technician {
+        settings.insert("conn-type".to_owned(), "incoming".to_owned());
+        settings.insert("gt-mode".to_owned(), "technician".to_owned());
+        settings.insert("approve-mode".to_owned(), "click".to_owned());
+    } else {
+        settings.insert("conn-type".to_owned(), "outgoing".to_owned());
+        settings.insert("gt-mode".to_owned(), "user".to_owned());
+    }
+}
+
 fn read_custom_client_advanced_settings(
     settings: serde_json::Value,
     map_display_settings: &HashMap<String, &&str>,
