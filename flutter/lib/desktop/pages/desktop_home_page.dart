@@ -159,8 +159,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   void _onRequestSupport() {
-    // TODO: Replace with actual technician IDs from config
-    const technicianIds = <String>[];
+    // Technician peer IDs that the user can request support from.
+    // TODO: Move to a config file or build-time setting for production.
+    const technicianIds = <String>['416283099'];
     if (technicianIds.isEmpty) {
       _supportStatus.value = 'No technicians configured';
       return;
