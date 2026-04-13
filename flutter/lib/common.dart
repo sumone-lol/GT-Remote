@@ -251,16 +251,16 @@ class MyTheme {
   MyTheme._();
 
   static const Color grayBg = Color(0xFFEFEFF2);
-  static const Color accent = Color(0xFF0071FF);
-  static const Color accent50 = Color(0x770071FF);
-  static const Color accent80 = Color(0xAA0071FF);
+  static const Color accent = Color(0xFF77489C);
+  static const Color accent50 = Color(0x7777489C);
+  static const Color accent80 = Color(0xAA77489C);
   static const Color canvasColor = Color(0xFF212121);
   static const Color border = Color(0xFFCCCCCC);
-  static const Color idColor = Color(0xFF00B6F0);
+  static const Color idColor = Color(0xFF77489C);
   static const Color darkGray = Color.fromARGB(255, 148, 148, 148);
   static const Color cmIdColor = Color(0xFF21790B);
   static const Color dark = Colors.black87;
-  static const Color button = Color(0xFF2C8CFF);
+  static const Color button = Color(0xFF8A5AB0);
   static const Color hoverBorder = Color(0xFF999999);
 
   // ListTile
@@ -624,10 +624,11 @@ class MyTheme {
     switch (v) {
       case "light":
         return ThemeMode.light;
-      case "dark":
-        return ThemeMode.dark;
-      default:
+      case "system":
         return ThemeMode.system;
+      case "dark":
+      default:
+        return ThemeMode.dark;
     }
   }
 }
@@ -3863,7 +3864,7 @@ bool get isCustomClient {
 }
 
 get defaultOptionLang => isCustomClient ? 'default' : '';
-get defaultOptionTheme => isCustomClient ? 'system' : '';
+get defaultOptionTheme => isCustomClient ? 'dark' : '';
 get defaultOptionYes => isCustomClient ? 'Y' : '';
 get defaultOptionNo => isCustomClient ? 'N' : '';
 get defaultOptionWhitelist => isCustomClient ? ',' : '';
