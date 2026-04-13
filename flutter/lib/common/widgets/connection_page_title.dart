@@ -33,6 +33,11 @@ Widget getConnectionPageTitle(BuildContext context, bool isWeb) {
           ),
         ],
       )),
+      Image.asset(
+        'assets/icon.png',
+        height: 48,
+        filterQuality: FilterQuality.medium,
+      ).marginOnly(right: 8),
     ],
   );
 }

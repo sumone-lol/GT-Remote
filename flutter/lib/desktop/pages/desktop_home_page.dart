@@ -131,7 +131,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     return ChangeNotifierProvider.value(
       value: gFFI.serverModel,
       child: Container(
-        width: isIncomingOnly ? 280.0 : 200.0,
+        width: isIncomingOnly
+            ? 280.0
+            : (MediaQuery.of(context).size.width / 3).clamp(280.0, 420.0),
         color: Theme.of(context).colorScheme.background,
         child: Stack(
           children: [
@@ -462,12 +464,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 
     if (isWindows && !bind.isDisableInstallation()) {
       if (!bind.mainIsInstalled()) {
-        return buildInstallCard(
-            "", bind.isOutgoingOnly() ? "" : "install_tip", "Install",
-            () async {
-          await rustDeskWinManager.closeAllSubWindows();
-          bind.mainGotoInstall();
-        });
+        // Install prompt moved to Settings > General for GamerTech Connect
+        // to keep the home page uncluttered and less alarming for end users.
+        return Container();
       } else if (bind.mainIsInstalledLowerVersion()) {
         return buildInstallCard(
             "Status", "Your installation is lower version.", "Click to upgrade",

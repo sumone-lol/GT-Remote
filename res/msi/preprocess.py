@@ -76,6 +76,9 @@ def make_parser():
         "--app-name", type=str, default="RustDesk", help="The app name."
     )
     parser.add_argument(
+        "--exe-name", type=str, default="", help="The main executable filename without extension. Defaults to --app-name when empty."
+    )
+    parser.add_argument(
         "-v", "--version", type=str, default="", help="The app version."
     )
     parser.add_argument(
@@ -152,13 +155,15 @@ def gen_auto_component(app_name, dist_dir):
 
 def gen_pre_vars(args, dist_dir):
     def func(lines, index_start):
-        upgrade_code = uuid.uuid5(uuid.NAMESPACE_OID, app_name + ".exe")
+        exe_name = args.exe_name or args.app_name
+        upgrade_code = uuid.uuid5(uuid.NAMESPACE_OID, exe_name + ".exe")
 
         indent = g_indent_unit * 1
         to_insert_lines = [
             f'{indent}<?define Version="{g_version}" ?>\n',
             f'{indent}<?define Manufacturer="{args.manufacturer}" ?>\n',
             f'{indent}<?define Product="{args.app_name}" ?>\n',
+            f'{indent}<?define ExeName="{exe_name}" ?>\n',
             f'{indent}<?define Description="{args.app_name} Installer" ?>\n',
             f'{indent}<?define ProductLower="{args.app_name.lower()}" ?>\n',
             f'{indent}<?define RegKeyRoot=".$(var.ProductLower)" ?>\n',
@@ -314,7 +319,7 @@ def gen_custom_ARPSYSTEMCOMPONENT_True(args, dist_dir):
             f'{indent}<RegistryValue Type="string" Name="DisplayName" Value="{args.app_name}" />\n'
         )
         lines_new.append(
-            f'{indent}<RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLFOLDER_INNER]{args.app_name}.exe" />\n'
+            f'{indent}<RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLFOLDER_INNER]{args.exe_name or args.app_name}.exe" />\n'
         )
         lines_new.append(
             f'{indent}<RegistryValue Type="string" Name="DisplayVersion" Value="{g_version}" />\n'
@@ -525,12 +530,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     app_name = args.app_name
+    exe_name = args.exe_name or args.app_name
     dist_dir = Path(sys.argv[0]).parent.joinpath(args.dist_dir).resolve()
 
     if not prepare_resources():
         sys.exit(-1)
 
-    if not init_global_vars(dist_dir, app_name, args):
+    if not init_global_vars(dist_dir, exe_name, args):
         sys.exit(-1)
 
     update_license_file(app_name)
@@ -550,7 +556,7 @@ if __name__ == "__main__":
     if not gen_conn_type(args):
         sys.exit(-1)
 
-    if not gen_auto_component(app_name, dist_dir):
+    if not gen_auto_component(exe_name, dist_dir):
         sys.exit(-1)
 
     if not gen_custom_dialog_bitmaps():

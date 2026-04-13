@@ -19,6 +19,7 @@ import 'package:flutter_hbb/models/server_model.dart';
 import 'package:flutter_hbb/models/state_model.dart';
 import 'package:flutter_hbb/plugin/manager.dart';
 import 'package:flutter_hbb/plugin/widgets/desktop_settings.dart';
+import 'package:flutter_hbb/utils/multi_window_manager.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -414,6 +415,10 @@ class _GeneralState extends State<_General> {
     return ListView(
       controller: scrollController,
       children: [
+        if (isWindows &&
+            !bind.isDisableInstallation() &&
+            !bind.mainIsInstalled())
+          installCard(context),
         if (!isWeb) service(),
         theme(),
         _Card(title: 'Language', children: [language()]),
@@ -424,6 +429,22 @@ class _GeneralState extends State<_General> {
         other()
       ],
     ).marginOnly(bottom: _kListViewBottomMargin);
+  }
+
+  Widget installCard(BuildContext context) {
+    return _Card(title: 'Install', children: [
+      Text(
+        translate('install_tip'),
+        style: TextStyle(height: 1.4),
+      ).marginOnly(bottom: 12),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: _Button('Install', () async {
+          await rustDeskWinManager.closeAllSubWindows();
+          bind.mainGotoInstall();
+        }),
+      ),
+    ]);
   }
 
   Widget theme() {
