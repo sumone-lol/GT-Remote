@@ -310,10 +310,21 @@ class _ConnectionPageState extends State<ConnectionPage>
             child: Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Flexible(child: _buildRemoteIDTextField(context)),
+                _buildRemoteIDTextField(context),
+                SizedBox(width: 24),
+                Expanded(
+                  child: Center(
+                    child: Image.asset(
+                      'assets/icon.png',
+                      height: 140 * gamerTechUiScale(context),
+                      filterQuality: FilterQuality.medium,
+                    ),
+                  ),
+                ),
               ],
-            ).marginOnly(top: 22),
+            ).marginOnly(top: 22, right: 12),
             SizedBox(height: 12),
             Divider().paddingOnly(right: 12),
             Expanded(child: PeerTabPage()),
@@ -341,9 +352,11 @@ class _ConnectionPageState extends State<ConnectionPage>
   /// UI for the remote ID TextField.
   /// Search for a peer.
   Widget _buildRemoteIDTextField(BuildContext context) {
+    final scale = gamerTechUiScale(context);
     var w = Container(
-      width: 320 + 20 * 2,
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+      width: (320 + 20 * 2) * scale,
+      padding: EdgeInsets.fromLTRB(
+          20 * scale, 24 * scale, 20 * scale, 22 * scale),
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(13)),
           border: Border.all(color: Theme.of(context).colorScheme.background)),
@@ -416,9 +429,9 @@ class _ConnectionPageState extends State<ConnectionPage>
                           enableSuggestions: false,
                           keyboardType: TextInputType.visiblePassword,
                           focusNode: fieldFocusNode,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'WorkSans',
-                            fontSize: 22,
+                            fontSize: 28 * scale,
                             height: 1.4,
                           ),
                           maxLines: 1,
@@ -430,8 +443,9 @@ class _ConnectionPageState extends State<ConnectionPage>
                               hintText: _idInputFocused.value
                                   ? null
                                   : translate('Enter Remote ID'),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 13)),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 15 * scale,
+                                  vertical: 13 * scale)),
                           controller: fieldTextEditingController,
                           inputFormatters: [IDTextInputFormatter()],
                           onChanged: (v) {

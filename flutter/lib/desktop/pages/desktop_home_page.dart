@@ -191,9 +191,10 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 
   buildIDBoard(BuildContext context) {
     final model = gFFI.serverModel;
+    final scale = gamerTechUiScale(context);
     return Container(
       margin: const EdgeInsets.only(left: 20, right: 11),
-      height: 57,
+      height: 57 * scale,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
@@ -209,7 +210,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: 25,
+                    height: 25 * scale,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +218,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                         Text(
                           translate("ID"),
                           style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14 * scale,
                               color: Theme.of(context)
                                   .textTheme
                                   .titleLarge
@@ -243,7 +244,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           contentPadding: EdgeInsets.only(top: 10, bottom: 10),
                         ),
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 26 * scale,
+                          fontWeight: FontWeight.w600,
                         ),
                       ).workaroundFreezeLinuxMint(),
                     ),
@@ -296,6 +298,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     RxBool refreshHover = false.obs;
     RxBool editHover = false.obs;
     final textColor = Theme.of(context).textTheme.titleLarge?.color;
+    final scale = gamerTechUiScale(context);
     final showOneTime = model.approveMode != 'click' &&
         model.verificationMethod != kUsePermanentPassword;
     return Container(
@@ -306,7 +309,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         children: [
           Container(
             width: 2,
-            height: 52,
+            height: 52 * scale,
             decoration: BoxDecoration(color: MyTheme.accent),
           ),
           Expanded(
@@ -318,7 +321,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   AutoSizeText(
                     translate("One-time Password"),
                     style: TextStyle(
-                        fontSize: 14, color: textColor?.withOpacity(0.5)),
+                        fontSize: 14 * scale,
+                        color: textColor?.withOpacity(0.5)),
                     maxLines: 1,
                   ),
                   Row(
@@ -340,7 +344,10 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                               contentPadding:
                                   EdgeInsets.only(top: 14, bottom: 10),
                             ),
-                            style: TextStyle(fontSize: 15),
+                            style: TextStyle(
+                              fontSize: 22 * scale,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ).workaroundFreezeLinuxMint(),
                         ),
                       ),
@@ -392,6 +399,16 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 
   buildTip(BuildContext context) {
     final isOutgoingOnly = bind.isOutgoingOnly();
+    final scale = gamerTechUiScale(context);
+    final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontSize: (Theme.of(context).textTheme.titleLarge?.fontSize ?? 20) *
+              scale,
+          fontWeight: FontWeight.w700,
+        );
+    final bodyStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
+          fontSize:
+              (Theme.of(context).textTheme.bodySmall?.fontSize ?? 12) * scale,
+        );
     return Padding(
       padding:
           const EdgeInsets.only(left: 20.0, right: 16, top: 16.0, bottom: 5),
@@ -406,7 +423,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   alignment: Alignment.centerLeft,
                   child: Text(
                     translate("Your Desktop"),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: titleStyle,
                   ),
                 ),
             ],
@@ -418,13 +435,13 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             Text(
               translate("desk_tip"),
               overflow: TextOverflow.clip,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: bodyStyle,
             ),
           if (isOutgoingOnly)
             Text(
               translate("outgoing_only_desk_tip"),
               overflow: TextOverflow.clip,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: bodyStyle,
             ),
         ],
       ),

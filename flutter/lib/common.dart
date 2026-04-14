@@ -3711,6 +3711,13 @@ Widget loadIcon(double size) {
           ));
 }
 
+// UI scale factor based on window width. Base is 1000px. Clamped so text
+// does not get absurdly large on big monitors.
+double gamerTechUiScale(BuildContext context) {
+  final w = MediaQuery.of(context).size.width;
+  return (w / 1000.0).clamp(1.0, 1.6);
+}
+
 var imcomingOnlyHomeSize = Size(280, 300);
 Size getIncomingOnlyHomeSize() {
   final magicWidth = isWindows ? 11.0 : 2.0;
