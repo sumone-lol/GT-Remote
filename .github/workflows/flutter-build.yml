@@ -186,6 +186,13 @@ jobs:
           mkdir -p ./SignOutput
           mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/gamertech-connect-${{ env.VERSION }}-${{ matrix.job.arch }}.exe
 
+      - name: Upload portable self-extracting exe
+        if: env.UPLOAD_ARTIFACT == 'true'
+        uses: actions/upload-artifact@master
+        with:
+          name: gamertech-connect-portable-${{ matrix.job.arch }}
+          path: ./SignOutput/gamertech-connect-${{ env.VERSION }}-${{ matrix.job.arch }}.exe
+
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
 
